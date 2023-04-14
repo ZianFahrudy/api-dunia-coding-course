@@ -2,6 +2,7 @@ package main
 
 import (
 	"api-dunia-coding/auth"
+	"api-dunia-coding/event"
 	"api-dunia-coding/handler"
 	"api-dunia-coding/helper"
 	"api-dunia-coding/member"
@@ -25,11 +26,14 @@ func main() {
 	}
 
 	memberRepository := member.NewRepository(db)
+	eventRepository := event.NewRepository(db)
 
 	memberService := member.NewService(memberRepository)
 	authService := auth.NewService()
+	eventService := event.NewService(eventRepository)
 
 	memberHandler := handler.NewMemberHandler(memberService, authService)
+	eventHandler := handler.NewEventHandler(eventService)
 
 	router := gin.Default()
 	router.Static("/images", "./images")
@@ -40,6 +44,9 @@ func main() {
 	api.POST("/login", memberHandler.Login)
 	api.POST("/check-email", memberHandler.CheckEmailAvaibility)
 	api.POST("/avatar", authMiddleware(authService, memberService), memberHandler.UploadAvatar)
+
+	api.GET("/events", eventHandler.GetEvents)
+	api.GET("/events/:id", eventHandler.GetEventDetail)
 
 	router.Run(":8999")
 
