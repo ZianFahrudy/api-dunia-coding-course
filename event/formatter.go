@@ -12,9 +12,9 @@ type EventFormatter struct {
 	// About         string                 `json:"about"`
 	// Description   string                 `json:"description"`
 	// Documentation string                 `json:"documentation"`
-	Mentor      MentorFormatter        `json:"mentor"`
-	Status      string                 `json:"status"`
-	JoinedEvent []JoinedEventFormatter `json:"joined_members"`
+	Mentor       MentorFormatter        `json:"mentor"`
+	Status       string                 `json:"status"`
+	JoinedEvents []JoinedEventFormatter `json:"joined_members"`
 }
 
 type EventDetailFormatter struct {
@@ -47,6 +47,53 @@ type MemberEventFormatter struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
+type CalendarEventFormatter struct {
+	Date   string                   `json:"date"`
+	Events []EventCalendarFormatter `json:"events"`
+}
+
+type EventCalendarFormatter struct {
+	ID        int             `json:"id"`
+	Label     string          `json:"label"`
+	Name      string          `json:"name"`
+	Date      string          `json:"date"`
+	StartTime string          `json:"start_time"`
+	EndTime   string          `json:"end_time"`
+	Mentor    MentorFormatter `json:"mentor"`
+	Status    string          `json:"status"`
+}
+
+func FormatCalendarEvent(event CalendarEvent) CalendarEventFormatter {
+	calendarEventFormatter := CalendarEventFormatter{}
+	calendarEventFormatter.Date = event.Date
+	eventsCalendar := []EventCalendarFormatter{}
+
+	for _, event := range event.Event {
+		eventCalendarFormatter := EventCalendarFormatter{}
+
+		eventCalendarFormatter.ID = event.ID
+		eventCalendarFormatter.Date = event.Date
+		eventCalendarFormatter.Label = event.Label
+		eventCalendarFormatter.Name = event.Name
+		eventCalendarFormatter.StartTime = event.StartTime
+		eventCalendarFormatter.EndTime = event.EndTime
+		eventCalendarFormatter.Status = event.Status
+
+		mentorFormatter := MentorFormatter{}
+
+		mentorFormatter.Name = event.Mentor.Name
+		mentorFormatter.Occupation = event.Mentor.Occupation
+		mentorFormatter.AvatarURL = event.Mentor.AvatarURL
+
+		eventCalendarFormatter.Mentor = mentorFormatter
+
+		calendarEventFormatter.Events = eventsCalendar
+		eventsCalendar = append(eventsCalendar, eventCalendarFormatter)
+	}
+	calendarEventFormatter.Events = eventsCalendar
+
+	return calendarEventFormatter
+}
 
 func FormatEvent(event Event) EventFormatter {
 	eventFormatter := EventFormatter{}
@@ -74,7 +121,7 @@ func FormatEvent(event Event) EventFormatter {
 
 	joinedEvents := []JoinedEventFormatter{}
 
-	for _, joinedEvent := range event.JoinedEvent {
+	for _, joinedEvent := range event.JoinedEvents {
 		memberEventFormatter := MemberEventFormatter{}
 		joinedEventFormatter := JoinedEventFormatter{}
 
@@ -88,7 +135,7 @@ func FormatEvent(event Event) EventFormatter {
 		joinedEvents = append(joinedEvents, joinedEventFormatter)
 	}
 
-	eventFormatter.JoinedEvent = joinedEvents
+	eventFormatter.JoinedEvents = joinedEvents
 
 	return eventFormatter
 
@@ -119,7 +166,7 @@ func FormatEventDetail(event Event) EventDetailFormatter {
 
 	joinedEvents := []JoinedEventFormatter{}
 
-	for _, joinedEvent := range event.JoinedEvent {
+	for _, joinedEvent := range event.JoinedEvents {
 		memberEventFormatter := MemberEventFormatter{}
 		joinedEventFormatter := JoinedEventFormatter{}
 
@@ -133,10 +180,20 @@ func FormatEventDetail(event Event) EventDetailFormatter {
 		joinedEvents = append(joinedEvents, joinedEventFormatter)
 	}
 
-	// eventFormatter.JoinedEvent = joinedEvents
+	// eventFormatter.JoinedEvent = joinedEventTime
 
 	return eventFormatter
 
+}
+func FormatCalendarEvents(events []CalendarEvent) []CalendarEventFormatter {
+	calendarEventsFormatter := []CalendarEventFormatter{}
+
+	for _, event := range events {
+		calendarEventFormatter := FormatCalendarEvent(event)
+		calendarEventsFormatter = append(calendarEventsFormatter, calendarEventFormatter)
+	}
+
+	return calendarEventsFormatter
 }
 
 func FormatEvents(events []Event) []EventFormatter {

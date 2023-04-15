@@ -21,12 +21,12 @@ type Event struct {
 	MentorID      int
 	Mentor        mentor.Mentor
 	Status        string
-	JoinedEvent   []JoinedEvent
+	JoinedEvents  []JoinedEvents
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }
 
-type JoinedEvent struct {
+type JoinedEvents struct {
 	ID        int
 	EventID   int
 	MemberID  int
@@ -34,3 +34,10 @@ type JoinedEvent struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
+
+type CalendarEvent struct {
+	Date  string
+	Event []Event
+}
+
+

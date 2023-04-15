@@ -47,8 +47,12 @@ func main() {
 
 	api.GET("/events", eventHandler.GetEvents)
 	api.GET("/events/:id", eventHandler.GetEventDetail)
+	api.GET("/events/week", eventHandler.GetEventsOfWeek)
+	api.GET("/events/upcoming", eventHandler.GetUpcomingEvents)
+	api.GET("/events/calendar", eventHandler.GetCalendarEvents)
+	api.POST("/events/presence", authMiddleware(authService, memberService), eventHandler.PresenceToEvent)
 
-	router.Run(":8999")
+	router.Run(":8998")
 
 }
 
