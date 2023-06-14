@@ -5,9 +5,9 @@ type Service interface {
 	UpdateStatusEvent(ID int, status string) error
 	GetEventByID(input GetEventDetailInput) (Event, error)
 	GetEventOfWeek() ([]Event, error)
-	GetEventByStatus() ([]Event, error)
+	GetEventByStatus(status string) ([]Event, error)
 	GetCalendarEvents() ([]CalendarEvent, error)
-	PresenceToEvent(input JoinEventInput) (JoinedEvents, error)
+	JoinToEvent(input JoinEventInput) (JoinedEvents, error)
 	CheckEventMember(eventID int, memberID int) (bool, error)
 }
 
@@ -55,8 +55,8 @@ func (s *service) GetEventOfWeek() ([]Event, error) {
 	return events, nil
 }
 
-func (s *service) GetEventByStatus() ([]Event, error) {
-	events, err := s.repository.FindByStatus()
+func (s *service) GetEventByStatus(status string) ([]Event, error) {
+	events, err := s.repository.FindByStatus(status)
 	if err != nil {
 		return events, err
 	}
@@ -73,7 +73,7 @@ func (s *service) GetCalendarEvents() ([]CalendarEvent, error) {
 	return calendarEvents, nil
 }
 
-func (s *service) PresenceToEvent(input JoinEventInput) (JoinedEvents, error) {
+func (s *service) JoinToEvent(input JoinEventInput) (JoinedEvents, error) {
 	joinedEvent := JoinedEvents{}
 
 	joinedEvent.EventID = input.EventID

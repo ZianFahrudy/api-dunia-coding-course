@@ -1,62 +1,92 @@
 package main
 
 import (
-	"api-dunia-coding/auth"
-	"api-dunia-coding/event"
-	"api-dunia-coding/handler"
+	// "api-dunia-coding/auth"
+
+	"api-dunia-coding/config"
+	"api-dunia-coding/controller"
+	"api-dunia-coding/exception"
 	"api-dunia-coding/helper"
 	"api-dunia-coding/member"
-	"fmt"
-	"log"
+	"api-dunia-coding/middleware"
+	"api-dunia-coding/repository"
+	"api-dunia-coding/service"
 	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 )
 
 func main() {
-	dsn := "root:root@tcp(localhost:8080)/duniacoding?charset=utf8mb4&parseTime=True&loc=Local"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	configuration := config.New()
+	db := config.NewDatabase(configuration)
 
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	//! repository
 
-	memberRepository := member.NewRepository(db)
-	eventRepository := event.NewRepository(db)
+	authRepository := repository.NewAuthRepositoryImpl(db)
 
-	memberService := member.NewService(memberRepository)
-	authService := auth.NewService()
-	eventService := event.NewService(eventRepository)
+	authService := service.NewAuthServiceImpl(authRepository)
 
-	memberHandler := handler.NewMemberHandler(memberService, authService)
-	eventHandler := handler.NewEventHandler(eventService)
+	authController := controller.NewAuthController(&authService, authRepository, configuration)
 
-	router := gin.Default()
-	router.Static("/images", "./images")
-	api := router.Group("/api/v1")
+	// memberRepository := member.NewRepository(db)
+	// eventRepository := event.NewRepository(db)
+	// myEventRepository := myevent.NewRepository(db)
 
-	// * Member
-	api.POST("/members", memberHandler.RegisterMember)
-	api.POST("/login", memberHandler.Login)
-	api.POST("/check-email", memberHandler.CheckEmailAvaibility)
-	api.POST("/avatar", authMiddleware(authService, memberService), memberHandler.UploadAvatar)
+	// //! service
+	// memberService := member.NewService(memberRepository)
+	// authService := auth.NewService()
+	// eventService := event.NewService(eventRepository)
+	// myEventService := myevent.NewService(myEventRepository)
 
-	api.GET("/events", eventHandler.GetEvents)
-	api.GET("/events/:id", eventHandler.GetEventDetail)
-	api.GET("/events/week", eventHandler.GetEventsOfWeek)
-	api.GET("/events/upcoming", eventHandler.GetUpcomingEvents)
-	api.GET("/events/calendar", eventHandler.GetCalendarEvents)
-	api.POST("/events/presence", authMiddleware(authService, memberService), eventHandler.PresenceToEvent)
+	// //! handler
+	// memberHandler := handler.NewMemberHandler(memberService, authService)
+	// eventHandler := handler.NewEventHandler(eventService)
+	// myEventHandler := handler.NewMyEventHandler(myEventService)
 
-	router.Run(":8998")
+	// router := gin.Default()
+	// router.Static("/images", "./images")
+	// api := router.Group("/api/v1")
+
+	// // *Member
+	// api.POST("/members", memberHandler.RegisterMember)
+	// api.POST("/login", memberHandler.Login)
+	// api.POST("/check-email", memberHandler.CheckEmailAvaibility)
+	// api.POST("/avatar", authMiddleware(authService, memberService), memberHandler.UploadAvatar)
+
+	// // * Event
+	// api.GET("/events", eventHandler.GetEvents)
+	// api.GET("/events/:id", eventHandler.GetEventDetail)
+	// api.GET("/events/week", eventHandler.GetEventsOfWeek)
+	// api.GET("/events/upcoming", eventHandler.GetUpcomingEvents)
+	// api.GET("/events/calendar", eventHandler.GetCalendarEvents)
+	// api.POST("/events/join", authMiddleware(authService, memberService), eventHandler.JoinToEvent)
+
+	// // * My Event
+	// api.GET("/myevents", authMiddleware(authService, memberService), myEventHandler.GetMyEvents)
+	// api.GET("/myevents/upcoming", authMiddleware(authService, memberService), myEventHandler.GetUpcomingMyEvents)
+	// api.POST("/myevents/presence/:id", authMiddleware(authService, memberService), myEventHandler.Presence)
+
+	// router.Run(":8081")
+
+	// Setup Gin
+	gin.SetMode(gin.DebugMode)
+	app := gin.Default()
+	app.Static("/images", "./images")
+	app.Use(gin.CustomRecovery(exception.ErrorHandler))
+	app.Use(middleware.CORSMiddleware())
+
+	// Setup Routing
+	authController.Route(app)
+
+	// Start App
+	err := app.Run(configuration.Get("SERVER.PORT"))
+	exception.PanicIfNeeded(err)
 
 }
 
-func authMiddleware(authService auth.Service, memberService member.Service) gin.HandlerFunc {
+func authMiddleware(jwtService service.JwtService, memberService member.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
@@ -71,15 +101,15 @@ func authMiddleware(authService auth.Service, memberService member.Service) gin.
 
 		arrayToken := strings.Split(authHeader, " ")
 
-		fmt.Println(len(arrayToken))
+		// fmt.Println(len(arrayToken))
 
 		if len(tokenString) == 2 {
 			tokenString = arrayToken[1]
 
 		}
-		fmt.Println(tokenString)
+		// fmt.Println(tokenString)
 
-		token, err := authService.ValidateToken(tokenString)
+		token, err := jwtService.ValidateToken(tokenString)
 
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, nil)

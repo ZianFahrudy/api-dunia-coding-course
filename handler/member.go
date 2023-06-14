@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"api-dunia-coding/auth"
 	"api-dunia-coding/helper"
 	"api-dunia-coding/member"
+	"api-dunia-coding/service"
 	"fmt"
 	"net/http"
 
@@ -12,11 +12,11 @@ import (
 
 type memberHandler struct {
 	memberService member.Service
-	authService   auth.Service
+	jwtService    service.JwtService
 }
 
-func NewMemberHandler(memberService member.Service, authService auth.Service) *memberHandler {
-	return &memberHandler{memberService, authService}
+func NewMemberHandler(memberService member.Service, jwtService service.JwtService) *memberHandler {
+	return &memberHandler{memberService, jwtService}
 }
 
 func (h *memberHandler) RegisterMember(c *gin.Context) {
@@ -51,7 +51,7 @@ func (h *memberHandler) RegisterMember(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authService.GenerateToken(newMember)
+	token, err := h.jwtService.GenerateToken(newMember)
 
 	if err != nil {
 		response := helper.APIResponse("Register Member Failed", http.StatusBadRequest, nil)
@@ -102,7 +102,7 @@ func (h *memberHandler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.authService.GenerateToken(loggedInUser)
+	token, err := h.jwtService.GenerateToken(loggedInUser)
 	if err != nil {
 		errMessage := gin.H{
 			"message": "Login Gagal",

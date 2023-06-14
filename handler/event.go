@@ -219,7 +219,7 @@ func (h *eventHandler) GetEventsOfWeek(c *gin.Context) {
 func (h *eventHandler) GetUpcomingEvents(c *gin.Context) {
 	dateStr := ""
 
-	events, err := h.eventService.GetEventByStatus()
+	events, err := h.eventService.GetEventByStatus("Upcoming")
 
 	if err != nil {
 		response := helper.APIResponse("Get Upcoming Events Failed", http.StatusBadRequest, nil)
@@ -293,41 +293,41 @@ func (h *eventHandler) GetCalendarEvents(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *eventHandler) PresenceToEvent(c *gin.Context) {
+func (h *eventHandler) JoinToEvent(c *gin.Context) {
 	var input event.JoinEventInput
 
 	err := c.ShouldBindJSON(&input)
 	if err != nil {
-		response := helper.APIResponse("Presence Failed", http.StatusUnprocessableEntity, nil)
+		response := helper.APIResponse("Join Failed", http.StatusUnprocessableEntity, nil)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
 	isAvailable, err := h.eventService.CheckEventMember(input.EventID, input.MemberID)
 	if err != nil {
-		response := helper.APIResponse("Presence Failed", http.StatusUnprocessableEntity, nil)
+		response := helper.APIResponse("Join Failed", http.StatusUnprocessableEntity, nil)
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
 
 	if !isAvailable {
-		_, err := h.eventService.PresenceToEvent(input)
+		_, err := h.eventService.JoinToEvent(input)
 		if err != nil {
-			response := helper.APIResponse("Presence Failed", http.StatusBadRequest, nil)
+			response := helper.APIResponse("Join Failed", http.StatusBadRequest, nil)
 			c.JSON(http.StatusBadRequest, response)
 			return
 		}
 
 		data := gin.H{
-			"is_presenced": true,
+			"is_join": true,
 		}
 
-		response := helper.APIResponse("Presence Success", http.StatusOK, data)
+		response := helper.APIResponse("Join Success", http.StatusOK, data)
 		c.JSON(http.StatusOK, response)
 		return
 	}
 
-	response := helper.APIResponse("Sudah Presensi", http.StatusOK, nil)
+	response := helper.APIResponse("Anda Sudah Join pada event ini", http.StatusOK, nil)
 	c.JSON(http.StatusOK, response)
 
 }

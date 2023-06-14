@@ -12,7 +12,7 @@ type Repository interface {
 	Update(event Event) (Event, error)
 	UpdateStatusEvent(ID int, status string) error
 	FindByDate() ([]Event, error)
-	FindByStatus() ([]Event, error)
+	FindByStatus(statusEvent string) ([]Event, error)
 	FindByGroupDate() ([]CalendarEvent, error)
 	SaveJoinEvent(joinedEvents JoinedEvents) (JoinedEvents, error)
 	CheckEventMember(eventID int, memberID int) (bool, error)
@@ -87,10 +87,10 @@ func (r *repository) FindByDate() ([]Event, error) {
 	return events, nil
 }
 
-func (r *repository) FindByStatus() ([]Event, error) {
+func (r *repository) FindByStatus(statusEvent string) ([]Event, error) {
 	var events []Event
 
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Where("status = ?", "Upcoming").Find(&events).Error
+	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Where("status = ?", statusEvent).Find(&events).Error
 
 	if err != nil {
 		return events, err

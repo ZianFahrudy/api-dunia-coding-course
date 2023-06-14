@@ -31,6 +31,7 @@ type JoinedEvents struct {
 	EventID   int
 	MemberID  int
 	Member    member.Member
+	Presence  bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -39,5 +40,3 @@ type CalendarEvent struct {
 	Date  string
 	Event []Event
 }
-
-
