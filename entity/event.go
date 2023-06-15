@@ -1,8 +1,6 @@
-package event
+package entity
 
 import (
-	"api-dunia-coding/member"
-	"api-dunia-coding/mentor"
 	"time"
 )
 
@@ -19,7 +17,7 @@ type Event struct {
 	Description   string
 	Documentation string
 	MentorID      int
-	Mentor        mentor.Mentor
+	Mentor        Mentor
 	Status        string
 	JoinedEvents  []JoinedEvents
 	CreatedAt     time.Time
@@ -30,7 +28,7 @@ type JoinedEvents struct {
 	ID        int
 	EventID   int
 	MemberID  int
-	Member    member.Member
+	Member    Member
 	Presence  bool
 	CreatedAt time.Time
 	UpdatedAt time.Time

@@ -1,4 +1,4 @@
-package mentor
+package entity
 
 import "time"
 

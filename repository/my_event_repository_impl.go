@@ -1,28 +1,22 @@
-package myevent
+package repository
 
 import (
-	"api-dunia-coding/event"
+	"api-dunia-coding/entity"
+	"context"
 
 	"gorm.io/gorm"
 )
 
-type Repository interface {
-	FindAll(memberID int) ([]event.Event, error)
-	FindByStatus(memberID int) ([]event.Event, error)
-	Update(eventID int, memberID int, presence bool) error
-	CheckIsPresenced(eventID int, memberID int) (bool, error)
-}
-
-type repository struct {
+type myEventRepositoryImpl struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) *repository {
-	return &repository{db}
+func NewMyEventRepositoryImpl(db *gorm.DB) *myEventRepositoryImpl {
+	return &myEventRepositoryImpl{db}
 }
 
-func (r *repository) FindAll(memberID int) ([]event.Event, error) {
-	var events []event.Event
+func (r *myEventRepositoryImpl) FindAll(ctx context.Context, memberID int) ([]entity.Event, error) {
+	var events []entity.Event
 
 	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Table("events").Joins("JOIN joined_events ON events.id = joined_events.event_id").Where("joined_events.member_id = ?", memberID).Find(&events).Error
 	if err != nil {
@@ -31,8 +25,8 @@ func (r *repository) FindAll(memberID int) ([]event.Event, error) {
 
 	return events, nil
 }
-func (r *repository) FindByStatus(memberID int) ([]event.Event, error) {
-	var events []event.Event
+func (r *myEventRepositoryImpl) FindByStatus(ctx context.Context, memberID int) ([]entity.Event, error) {
+	var events []entity.Event
 
 	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Table("events").Joins("JOIN joined_events ON events.id = joined_events.event_id").Where("joined_events.member_id = ?", memberID).Where("status = ?", "Upcoming").Find(&events).Error
 	if err != nil {
@@ -42,9 +36,9 @@ func (r *repository) FindByStatus(memberID int) ([]event.Event, error) {
 	return events, nil
 }
 
-func (r *repository) Update(eventID int, memberID int, presence bool) error {
+func (r *myEventRepositoryImpl) Update(ctx context.Context, eventID int, memberID int, presence bool) error {
 
-	var joinedEvent event.JoinedEvents
+	var joinedEvent entity.JoinedEvents
 
 	result := r.db.Where("event_id = ? AND member_id = ?", eventID, memberID).First(&joinedEvent)
 
@@ -64,9 +58,9 @@ func (r *repository) Update(eventID int, memberID int, presence bool) error {
 	return nil
 }
 
-func (r *repository) CheckIsPresenced(eventID int, memberID int) (bool, error) {
+func (r *myEventRepositoryImpl) CheckIsPresenced(ctx context.Context, eventID int, memberID int) (bool, error) {
 	var count int64
-	err := r.db.Model(&event.JoinedEvents{}).Where("event_id = ? AND member_id = ? AND presence = ?", eventID, memberID, true).Count(&count).Error
+	err := r.db.Model(&entity.JoinedEvents{}).Where("event_id = ? AND member_id = ? AND presence = ?", eventID, memberID, true).Count(&count).Error
 	if err != nil {
 		return false, err
 	}

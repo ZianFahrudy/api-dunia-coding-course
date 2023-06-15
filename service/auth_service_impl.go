@@ -2,7 +2,6 @@ package service
 
 import (
 	"api-dunia-coding/entity"
-	"api-dunia-coding/member"
 	"api-dunia-coding/model"
 	"api-dunia-coding/repository"
 	"context"
@@ -86,21 +85,6 @@ func (s *authServiceImpl) GetMemberByID(ctx context.Context, body int) (entity.M
 	return member, nil
 }
 
-func (s *authServiceImpl) IsEmailAvailable(input member.CheckEmailInput) (bool, error) {
-
-	// member, err := s.AuthRepository.FindByEmail(input.Email)
-
-	// if err != nil {
-	// 	return false, err
-	// }
-
-	// if member.ID == 0 {
-	// 	return true, nil
-	// }
-
-	return false, nil
-}
-
 func (s *authServiceImpl) SaveAvatar(ctx context.Context, ID int, fileLocation string) (entity.Member, error) {
 	member, err := s.AuthRepository.FindByID(ctx, ID)
 	fmt.Println(member.Email)
@@ -121,7 +105,7 @@ func (s *authServiceImpl) SaveAvatar(ctx context.Context, ID int, fileLocation s
 
 func (s *authServiceImpl) CheckEmailAvailable(ctx context.Context, input string) (bool, error) {
 
-	isExist, _ := s.AuthRepository.FindEmailExist(ctx, input)
+	isExist := s.AuthRepository.FindEmailExist(ctx, input)
 
 	return isExist, nil
 }

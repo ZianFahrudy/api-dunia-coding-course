@@ -4,7 +4,6 @@ import (
 	"api-dunia-coding/entity"
 	"api-dunia-coding/exception"
 	"context"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -34,17 +33,15 @@ func (r *authRepositoryImpl) FindByEmail(ctx context.Context, email string) (ent
 	return member, nil
 }
 
-func (r *authRepositoryImpl) FindEmailExist(ctx context.Context, email string) (bool, error) {
+func (r *authRepositoryImpl) FindEmailExist(ctx context.Context, email string) bool {
 	var member entity.Member
 
 	err := r.db.WithContext(ctx).First(&member, "email = ?", email).Error
 	if err != nil {
-		fmt.Println("Email error")
-		return false, err
+		return false
 	}
-	fmt.Println("Email sudah ada")
 
-	return true, nil
+	return true
 }
 
 func (r *authRepositoryImpl) FindByID(ctx context.Context, ID int) (entity.Member, error) {

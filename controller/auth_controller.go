@@ -17,7 +17,6 @@ import (
 
 type AuthController struct {
 	AuthService service.AuthService
-	JwtService  service.JwtService
 	repository.AuthRepository
 	config.Config
 }
@@ -84,7 +83,6 @@ func (controller *AuthController) RegisterMember(c *gin.Context) {
 	// }
 
 	// generate token
-	// token, _ := service.NewJwtService().GenerateToken(newMember)
 	token := common.GenerateToken(newMember.Name, newMember.ID, controller.Config)
 
 	// mapping data register Success
@@ -136,10 +134,17 @@ func (controller *AuthController) Login(c *gin.Context) {
 	}
 	tokenJwtResult := common.GenerateToken(response.Name, response.ID, controller.Config)
 
+	resultWithToken := map[string]interface{}{
+		"member_id":    response.ID,
+		"member_name":  response.Name,
+		"member_email": response.Email,
+		"token":        tokenJwtResult,
+	}
+
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
 		Message: "Login Berhasil",
-		Data:    tokenJwtResult,
+		Data:    resultWithToken,
 	})
 
 }
@@ -160,8 +165,8 @@ func (controller *AuthController) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	path := "images/" + file.Filename
-	path = fmt.Sprintf("images/%d-%s", currentUser.ID, file.Filename)
+	path := "storage/" + file.Filename
+	path = fmt.Sprintf("storage/%d-%s", currentUser.ID, file.Filename)
 
 	err = c.SaveUploadedFile(file, path)
 

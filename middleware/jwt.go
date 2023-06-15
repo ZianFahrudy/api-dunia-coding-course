@@ -58,7 +58,7 @@ func AuthenticateJWT(repository repository.AuthRepository, config config.Config)
 		}
 		memberID := int(claims["member_id"].(float64))
 		member, err := service.NewAuthServiceImpl(repository).GetMemberByID(c.Copy(), memberID)
-		// member, err := service.AuthService.GetMemberByID(memberID)
+
 		if err != nil {
 			c.AbortWithStatusJSON(401, model.GeneralResponse{
 				Code:    401,

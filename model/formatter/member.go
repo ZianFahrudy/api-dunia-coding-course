@@ -1,4 +1,6 @@
-package member
+package formatter
+
+import "api-dunia-coding/entity"
 
 type MemberFormatter struct {
 	ID    int    `json:"id"`
@@ -12,7 +14,7 @@ type MemberLoginFormatter struct {
 	Token   string `json:"token"`
 }
 
-func FormatMember(member Member, token string) MemberFormatter {
+func FormatMember(member entity.Member, token string) MemberFormatter {
 	formatter := MemberFormatter{
 		ID:    member.ID,
 		Name:  member.Name,
