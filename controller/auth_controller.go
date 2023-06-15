@@ -73,14 +73,6 @@ func (controller *AuthController) RegisterMember(c *gin.Context) {
 
 	// create new member
 	newMember := controller.AuthService.RegisterMember(c.Copy(), input)
-	// if errRegister != nil {
-	// 	c.JSON(http.StatusBadRequest, model.GeneralResponse{
-	// 		Code:    http.StatusBadRequest,
-	// 		Message: "Register Member Failed",
-	// 		Data:    nil,
-	// 	})
-	// 	return
-	// }
 
 	// generate token
 	token := common.GenerateToken(newMember.Name, newMember.ID, controller.Config)
@@ -181,17 +173,17 @@ func (controller *AuthController) UploadAvatar(c *gin.Context) {
 		return
 	}
 
-	controller.AuthService.SaveAvatar(c.Copy(), currentUser.ID, path)
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, model.GeneralResponse{
-	// 		Code:    http.StatusBadRequest,
-	// 		Message: "Failed to upload avatar image",
-	// 		Data: gin.H{
-	// 			"is_uploaded": false,
-	// 		},
-	// 	})
-	// 	return
-	// }
+	_, err = controller.AuthService.SaveAvatar(c.Copy(), currentUser.ID, fmt.Sprintf("http:localhost:8081/%s", path))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, model.GeneralResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Failed to upload avatar image",
+			Data: gin.H{
+				"is_uploaded": false,
+			},
+		})
+		return
+	}
 
 	c.JSON(http.StatusOK, model.GeneralResponse{
 		Code:    http.StatusOK,
