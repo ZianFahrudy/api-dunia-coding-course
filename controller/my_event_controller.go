@@ -35,7 +35,7 @@ func (controller *MyEventController) Route(app *gin.Engine) {
 
 func (controller *MyEventController) GetMyEvents(c *gin.Context) {
 
-	currentUser := c.MustGet("currentUser").(entity.Member)
+	currentUser := c.MustGet(controller.Get("JWT_CURRENT_USER")).(entity.Member)
 
 	events, err := controller.MyEventService.GetMyEvents(c.Copy(), currentUser.ID)
 
@@ -60,7 +60,7 @@ func (controller *MyEventController) GetMyEvents(c *gin.Context) {
 
 func (controller *MyEventController) GetUpcomingMyEvents(c *gin.Context) {
 
-	currentUser := c.MustGet("currentUser").(entity.Member)
+	currentUser := c.MustGet(controller.Get("JWT_CURRENT_USER")).(entity.Member)
 
 	events, err := controller.MyEventService.GetUpcomingMyEvents(c.Copy(), currentUser.ID)
 
@@ -82,7 +82,7 @@ func (controller *MyEventController) GetUpcomingMyEvents(c *gin.Context) {
 }
 
 func (controller *MyEventController) Presence(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(entity.Member)
+	currentUser := c.MustGet(controller.Get("JWT_CURRENT_USER")).(entity.Member)
 
 	var input model.PresenceInput
 

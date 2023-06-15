@@ -142,7 +142,7 @@ func (controller *AuthController) Login(c *gin.Context) {
 }
 
 func (controller *AuthController) UploadAvatar(c *gin.Context) {
-	currentUser := c.MustGet("currentUser").(entity.Member)
+	currentUser := c.MustGet(controller.Get("JWT_CURRENT_USER")).(entity.Member)
 
 	file, err := c.FormFile("avatar")
 
