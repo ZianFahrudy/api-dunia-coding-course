@@ -2,11 +2,11 @@ package controller
 
 import (
 	"api-dunia-coding/config"
-	"api-dunia-coding/entity"
+	"api-dunia-coding/data/formatter"
+	"api-dunia-coding/data/model"
+	"api-dunia-coding/domain/entity"
+	"api-dunia-coding/domain/repository"
 	"api-dunia-coding/middleware"
-	"api-dunia-coding/model"
-	"api-dunia-coding/model/formatter"
-	"api-dunia-coding/repository"
 	"api-dunia-coding/service"
 	"net/http"
 

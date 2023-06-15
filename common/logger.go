@@ -1,7 +1,7 @@
 package common
 
 import (
-	"api-dunia-coding/exception"
+	"api-dunia-coding/common/exception"
 	"context"
 	"io"
 	"os"

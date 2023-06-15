@@ -1,7 +1,7 @@
 package config
 
 import (
-	"api-dunia-coding/exception"
+	"api-dunia-coding/common/exception"
 	"os"
 
 	"github.com/joho/godotenv"

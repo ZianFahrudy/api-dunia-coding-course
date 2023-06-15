@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"api-dunia-coding/entity"
+	"api-dunia-coding/domain/entity"
 	"context"
 
 	"gorm.io/gorm"

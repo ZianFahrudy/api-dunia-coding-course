@@ -1,6 +1,8 @@
 package formatter
 
-import "api-dunia-coding/entity"
+import (
+	"api-dunia-coding/domain/entity"
+)
 
 // response formatter
 type EventFormatter struct {

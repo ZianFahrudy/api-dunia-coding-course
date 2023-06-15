@@ -2,12 +2,12 @@ package controller
 
 import (
 	"api-dunia-coding/common"
+	"api-dunia-coding/common/exception"
 	"api-dunia-coding/config"
-	"api-dunia-coding/entity"
-	"api-dunia-coding/exception"
+	"api-dunia-coding/data/model"
+	"api-dunia-coding/domain/entity"
+	"api-dunia-coding/domain/repository"
 	"api-dunia-coding/middleware"
-	"api-dunia-coding/model"
-	"api-dunia-coding/repository"
 	"api-dunia-coding/service"
 	"fmt"
 	"net/http"

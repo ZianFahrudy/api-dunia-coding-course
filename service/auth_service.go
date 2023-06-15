@@ -1,8 +1,8 @@
 package service
 
 import (
-	"api-dunia-coding/entity"
-	"api-dunia-coding/model"
+	"api-dunia-coding/data/model"
+	"api-dunia-coding/domain/entity"
 	"context"
 )
 

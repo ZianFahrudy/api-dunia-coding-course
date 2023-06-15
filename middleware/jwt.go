@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"api-dunia-coding/config"
-	"api-dunia-coding/model"
-	"api-dunia-coding/repository"
+	"api-dunia-coding/data/model"
+	"api-dunia-coding/domain/repository"
 	"api-dunia-coding/service"
 	"errors"
 	"strings"
@@ -11,11 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
-
-type Claims struct {
-	UserID string `json:"userId"`
-	jwt.Claims
-}
 
 func AuthenticateJWT(repository repository.AuthRepository, config config.Config) gin.HandlerFunc {
 	jwtSecret := config.Get("JWT_SECRET_KEY")

@@ -1,11 +1,11 @@
 package main
 
 import (
+	"api-dunia-coding/common/exception"
 	"api-dunia-coding/config"
 	"api-dunia-coding/controller"
-	"api-dunia-coding/exception"
+	"api-dunia-coding/domain/repository"
 	"api-dunia-coding/middleware"
-	"api-dunia-coding/repository"
 	"api-dunia-coding/service"
 
 	"github.com/gin-gonic/gin"

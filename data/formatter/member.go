@@ -1,6 +1,8 @@
 package formatter
 
-import "api-dunia-coding/entity"
+import (
+	"api-dunia-coding/domain/entity"
+)
 
 type MemberFormatter struct {
 	ID    int    `json:"id"`

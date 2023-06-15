@@ -1,7 +1,7 @@
 package exception
 
 import (
-	"api-dunia-coding/model"
+	"api-dunia-coding/data/model"
 	"encoding/json"
 
 	"github.com/gin-gonic/gin"
