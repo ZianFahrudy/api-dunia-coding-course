@@ -18,7 +18,7 @@ func NewMyEventRepositoryImpl(db *gorm.DB) *myEventRepositoryImpl {
 func (r *myEventRepositoryImpl) FindAll(ctx context.Context, memberID int) ([]entity.Event, error) {
 	var events []entity.Event
 
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Table("events").Joins("JOIN joined_events ON events.id = joined_events.event_id").Where("joined_events.member_id = ?", memberID).Find(&events).Error
+	err := r.db.WithContext(ctx).Preload("Mentor").Preload("JoinedEvents.Member").Table("events").Joins("JOIN joined_events ON events.id = joined_events.event_id").Where("joined_events.member_id = ?", memberID).Find(&events).Error
 	if err != nil {
 		return events, err
 	}
@@ -28,7 +28,7 @@ func (r *myEventRepositoryImpl) FindAll(ctx context.Context, memberID int) ([]en
 func (r *myEventRepositoryImpl) FindByStatus(ctx context.Context, memberID int) ([]entity.Event, error) {
 	var events []entity.Event
 
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Table("events").Joins("JOIN joined_events ON events.id = joined_events.event_id").Where("joined_events.member_id = ?", memberID).Where("status = ?", "Upcoming").Find(&events).Error
+	err := r.db.WithContext(ctx).Preload("Mentor").Preload("JoinedEvents.Member").Table("events").Joins("JOIN joined_events ON events.id = joined_events.event_id").Where("joined_events.member_id = ?", memberID).Where("status = ?", "Upcoming").Find(&events).Error
 	if err != nil {
 		return events, err
 	}
@@ -40,7 +40,7 @@ func (r *myEventRepositoryImpl) Update(ctx context.Context, eventID int, memberI
 
 	var joinedEvent entity.JoinedEvents
 
-	result := r.db.Where("event_id = ? AND member_id = ?", eventID, memberID).First(&joinedEvent)
+	result := r.db.WithContext(ctx).Where("event_id = ? AND member_id = ?", eventID, memberID).First(&joinedEvent)
 
 	if result.Error != nil {
 		return result.Error
@@ -50,7 +50,7 @@ func (r *myEventRepositoryImpl) Update(ctx context.Context, eventID int, memberI
 	joinedEvent.Presence = presence
 
 	// Simpan perubahan ke dalam database
-	result = r.db.Save(&joinedEvent)
+	result = r.db.WithContext(ctx).Save(&joinedEvent)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -60,7 +60,7 @@ func (r *myEventRepositoryImpl) Update(ctx context.Context, eventID int, memberI
 
 func (r *myEventRepositoryImpl) CheckIsPresenced(ctx context.Context, eventID int, memberID int) (bool, error) {
 	var count int64
-	err := r.db.Model(&entity.JoinedEvents{}).Where("event_id = ? AND member_id = ? AND presence = ?", eventID, memberID, true).Count(&count).Error
+	err := r.db.WithContext(ctx).Model(&entity.JoinedEvents{}).Where("event_id = ? AND member_id = ? AND presence = ?", eventID, memberID, true).Count(&count).Error
 	if err != nil {
 		return false, err
 	}

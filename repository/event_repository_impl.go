@@ -19,7 +19,7 @@ func NewEventRepositoryImpl(db *gorm.DB) *eventRepositoryImpl {
 func (r *eventRepositoryImpl) FindAll(ctx context.Context) ([]entity.Event, error) {
 	var events []entity.Event
 
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Find(&events).Error
+	err := r.db.WithContext(ctx).Preload("Mentor").Preload("JoinedEvents.Member").Find(&events).Error
 
 	if err != nil {
 		return events, err
@@ -31,7 +31,7 @@ func (r *eventRepositoryImpl) FindAll(ctx context.Context) ([]entity.Event, erro
 func (r *eventRepositoryImpl) FindByID(ctx context.Context, ID int) (entity.Event, error) {
 	var event entity.Event
 
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Where("id = ?", ID).Find(&event).Error
+	err := r.db.WithContext(ctx).Preload("Mentor").Preload("JoinedEvents.Member").Where("id = ?", ID).Find(&event).Error
 
 	if err != nil {
 		return event, err
@@ -41,7 +41,7 @@ func (r *eventRepositoryImpl) FindByID(ctx context.Context, ID int) (entity.Even
 }
 
 func (r *eventRepositoryImpl) Update(ctx context.Context, event entity.Event) (entity.Event, error) {
-	err := r.db.Save(&event).Error
+	err := r.db.WithContext(ctx).Save(&event).Error
 
 	if err != nil {
 		return event, err
@@ -52,7 +52,7 @@ func (r *eventRepositoryImpl) Update(ctx context.Context, event entity.Event) (e
 
 func (r *eventRepositoryImpl) UpdateStatusEvent(ctx context.Context, ID int, status string) error {
 
-	err := r.db.Model(&entity.Event{}).Where("id = ?", ID).Update("status", status).Error
+	err := r.db.WithContext(ctx).Model(&entity.Event{}).Where("id = ?", ID).Update("status", status).Error
 
 	if err != nil {
 		return err
@@ -69,7 +69,7 @@ func (r *eventRepositoryImpl) FindByDate(ctx context.Context) ([]entity.Event, e
 
 	startWeek := startOfWeek.Format("2006-01-02")
 	endWeek := endOfWeek.Format("2006-01-02")
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Where("date BETWEEN ? AND ?", startWeek, endWeek).Find(&events).Error
+	err := r.db.WithContext(ctx).Preload("Mentor").Preload("JoinedEvents.Member").Where("date BETWEEN ? AND ?", startWeek, endWeek).Find(&events).Error
 	if err != nil {
 		return events, err
 	}
@@ -80,7 +80,7 @@ func (r *eventRepositoryImpl) FindByDate(ctx context.Context) ([]entity.Event, e
 func (r *eventRepositoryImpl) FindByStatus(ctx context.Context, statusEvent string) ([]entity.Event, error) {
 	var events []entity.Event
 
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").Where("status = ?", statusEvent).Find(&events).Error
+	err := r.db.WithContext(ctx).Preload("Mentor").Preload("JoinedEvents.Member").Where("status = ?", statusEvent).Find(&events).Error
 
 	if err != nil {
 		return events, err
@@ -91,7 +91,7 @@ func (r *eventRepositoryImpl) FindByStatus(ctx context.Context, statusEvent stri
 
 func (r *eventRepositoryImpl) FindByGroupDate(ctx context.Context) ([]entity.CalendarEvent, error) {
 	var events []entity.Event
-	err := r.db.Preload("Mentor").Preload("JoinedEvents.Member").
+	err := r.db.WithContext(ctx).Preload("Mentor").Preload("JoinedEvents.Member").
 		Table("events").Select("date, id, name, label, mentor_id, start_time, end_time, status").Order("date desc").Find(&events).Error
 	if err != nil {
 		panic(err)
@@ -113,7 +113,7 @@ func (r *eventRepositoryImpl) FindByGroupDate(ctx context.Context) ([]entity.Cal
 
 func (r *eventRepositoryImpl) SaveJoinEvent(ctx context.Context, joinedEvent entity.JoinedEvents) (entity.JoinedEvents, error) {
 
-	err := r.db.Table("joined_events").Create(&joinedEvent).Error
+	err := r.db.WithContext(ctx).Table("joined_events").Create(&joinedEvent).Error
 	if err != nil {
 		return joinedEvent, err
 	}
@@ -123,7 +123,7 @@ func (r *eventRepositoryImpl) SaveJoinEvent(ctx context.Context, joinedEvent ent
 
 func (r *eventRepositoryImpl) CheckEventMember(ctx context.Context, eventID int, memberID int) (bool, error) {
 	var count int64
-	err := r.db.Table("joined_events").Where("event_id = ? AND member_id = ?", eventID, memberID).Count(&count).Error
+	err := r.db.WithContext(ctx).Table("joined_events").Where("event_id = ? AND member_id = ?", eventID, memberID).Count(&count).Error
 	if err != nil {
 		return false, err
 	}
