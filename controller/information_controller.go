@@ -27,7 +27,7 @@ func (controller *InformationController) Route(app *gin.Engine) {
 
 	api.GET("/informations", controller.GetInformations)
 	api.DELETE("/informations/:id", controller.DeteleInformation)
-	api.POST("/informations", controller.DeteleAllInformation)
+	// api.POST("/informations", controller.DeteleAllInformation)
 
 }
 
