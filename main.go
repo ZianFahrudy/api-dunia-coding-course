@@ -21,19 +21,22 @@ func main() {
 	authRepository := repository.NewAuthRepositoryImpl(db)
 	eventRepository := repository.NewEventRepositoryImpl(db)
 	myEventRepository := repository.NewMyEventRepositoryImpl(db)
+	informationRepository := repository.NewInformationRepositoryImpl(db)
 
 	// service
 	authService := service.NewAuthServiceImpl(authRepository)
 	eventService := service.NewEventServiceImpl(eventRepository)
 	myEventService := service.NewMyEventServiceImpl(myEventRepository)
+	informationService := service.NewInformationServiceImpl(informationRepository)
 
 	// controller
 	authController := controller.NewAuthController(&authService, authRepository, configuration)
 	eventController := controller.NewEventController(&eventService, authRepository, eventRepository, configuration)
 	myEventController := controller.NewMyEventController(&myEventService, authRepository, myEventRepository, configuration)
+	informationController := controller.NewInformationController(&informationService, authRepository, informationRepository, configuration)
 
 	// Setup Gin
-	gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 	app := gin.Default()
 	app.Static("/storage", "./storage")
 	app.Use(gin.CustomRecovery(exception.ErrorHandler))
@@ -43,6 +46,7 @@ func main() {
 	authController.Route(app)
 	eventController.Route(app)
 	myEventController.Route(app)
+	informationController.Route(app)
 
 	// Start App
 	err := app.Run(configuration.Get("SERVER.PORT"))
